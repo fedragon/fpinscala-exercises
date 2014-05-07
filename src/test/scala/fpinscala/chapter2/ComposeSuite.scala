@@ -1,4 +1,5 @@
 package fpinscala
+package chapter2
 
 import org.junit.runner.RunWith
 import org.scalatest.{FunSuite, Matchers}

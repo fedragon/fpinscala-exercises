@@ -1,4 +1,5 @@
 package fpinscala
+package chapter2
 
 object Fibonacci {
   def apply(n: Int): Int = {
