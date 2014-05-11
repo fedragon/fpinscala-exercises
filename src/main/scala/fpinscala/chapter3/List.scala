@@ -116,4 +116,22 @@ object List {
     foldRight(xs, ys)(Cons(_, _))
 
   def concat[A](zs: List[List[A]]): List[A] = foldRight(zs, Nil: List[A])(append)
+
+  def addOne(xs: List[Int]): List[Int] =
+    xs match {
+      case Nil => Nil
+      case Cons(h, t) => Cons(h + 1, addOne(t))
+    }
+
+  def convert(xs: List[Double]): List[String] =
+    xs match {
+      case Nil => Nil
+      case Cons(h, t) => Cons(h.toString, convert(t))
+    }
+
+  def map[A, B](xs: List[A])(f: A => B): List[B] =
+    xs match {
+      case Nil => Nil
+      case Cons(h, t) => Cons(f(h), map(t)(f))
+    }
 }

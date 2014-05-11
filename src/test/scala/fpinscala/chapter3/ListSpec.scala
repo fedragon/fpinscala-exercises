@@ -69,4 +69,17 @@ class ListSpec extends FlatSpec with Matchers {
   it should "concat two lists" in {
     concat(List(List(1, 2), List(3, 4))) shouldBe List(1, 2, 3, 4)
   }
+
+  it should "add 1 to all elements in the list" in {
+    addOne(List(1, 2, 3)) shouldBe List(2, 3, 4)
+  }
+
+  it should "convert all elements in the list to Strings" in {
+    convert(List(1.0, 2.0, 3.0)) shouldBe List("1.0", "2.0", "3.0")
+  }
+
+  it should "map over a list" in {
+    map(List(1, 2, 3))(_ + 1) shouldBe List(2, 3, 4)
+    map(List(1, 2, 3))(_.toString) shouldBe List("1", "2", "3")
+  }
 }
