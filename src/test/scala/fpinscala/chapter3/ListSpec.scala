@@ -1,12 +1,7 @@
 package fpinscala
 package chapter3
 
-import org.junit.runner.RunWith
-import org.scalatest.{FlatSpec, Matchers}
-import org.scalatest.junit.JUnitRunner
-
-@RunWith(classOf[JUnitRunner])
-class ListSpec extends FlatSpec with Matchers {
+class ListSpec extends UnitSpec {
 
   import List._
 
@@ -81,5 +76,13 @@ class ListSpec extends FlatSpec with Matchers {
   it should "map over a list" in {
     map(List(1, 2, 3))(_ + 1) shouldBe List(2, 3, 4)
     map(List(1, 2, 3))(_.toString) shouldBe List("1", "2", "3")
+  }
+
+  it should "filter a list" in {
+    filter(List(1, 2, 3))(_ % 2 == 0) shouldBe List(2)
+  }
+
+  it should "flatMap a list" in {
+    flatMap(List(1, 2, 3))(List(_)) shouldBe List(1, 2, 3)
   }
 }

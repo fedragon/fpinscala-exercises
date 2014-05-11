@@ -134,4 +134,21 @@ object List {
       case Nil => Nil
       case Cons(h, t) => Cons(f(h), map(t)(f))
     }
+
+  def filter[A](xs: List[A])(f: A => Boolean): List[A] = {
+    def filt(ys: List[A], acc: List[A]): List[A] = {
+      ys match {
+        case Nil => acc
+        case Cons(h, t) =>
+          if(f(h)) filt(t, Cons(h, acc))
+          else filt(t, acc)
+      }
+    }
+
+    filt(xs, Nil)
+  }
+
+  def flatMap[A, B](xs: List[A])(f: A => List[B]): List[B] = {
+    foldLeft(map(xs)(f), Nil: List[B])(append)
+  }
 }
