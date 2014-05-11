@@ -8,12 +8,16 @@ class CurryingSuite extends UnitSpec {
   it should "curry a function" in {
     val f = (a: Int, b: Int) => a + b
 
-    f(2, 3) shouldBe curry(f)(2)(3)
+    forAll { (x: Int, y: Int) =>
+      f(x, y) shouldBe curry(f)(x)(y)
+    }
   }
 
   it should "uncurry a function" in {
     val f = (a: Int) => (b: Int) => a + b
 
-    f(2)(3) shouldBe uncurry(f)(2, 3)
+    forAll { (x: Int, y: Int) =>
+      f(x)(y) shouldBe uncurry(f)(x, y)
+    }
   }
 }

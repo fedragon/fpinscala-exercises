@@ -1,88 +1,156 @@
 package fpinscala
 package chapter3
 
+import org.scalacheck.{Arbitrary, Gen}
+
+object Helpers {
+  import fpinscala.chapter3.{List => MyList, Nil => MyNil}
+  import scala.collection.immutable.{List, Nil}
+
+  implicit class ToScalaList[A](val xs: MyList[A]) extends AnyVal {
+    def toScalaList: List[A] = {
+      def convert(ys: MyList[A], acc: List[A]): List[A] =
+        ys match {
+          case MyNil => acc
+          case Cons(h, t) => convert(t, h :: acc)
+        }
+
+      convert(xs, Nil).reverse
+    }
+  }
+}
+
 class ListSpec extends UnitSpec {
 
-  import List._
+  import List._, Helpers._
+
+  implicit val arbitraryIntList = Arbitrary(Gen.oneOf(List(1), List(1, 2, 3, 4)))
+  implicit val arbitraryDoubleList = Arbitrary(Gen.oneOf(List(1.0), List(1.0, 2.0, 3.0, 4.0)))
 
   it should "return the tail" in {
-    tail(Nil) shouldBe Nil
-    tail(List(1, 2, 3)) shouldBe List(2, 3)
+    forAll { (xs: List[Int]) =>
+      tail(xs).toScalaList shouldBe xs.toScalaList.tail
+    }
   }
 
   it should "replace the head" in {
-    setHead(Nil, 4) shouldBe Nil
-    setHead(List(1, 2, 3), 4) shouldBe List(4, 2, 3)
+    forAll { (xs: List[Int], n: Int) =>
+      setHead(xs, n).toScalaList shouldBe (n :: xs.toScalaList.tail)
+    }
   }
 
   it should "drop the first n elements" in {
-    drop(Nil, 2) shouldBe Nil
-    drop(List(1, 2, 3, 4), 2) shouldBe List(3, 4)
+    forAll { (xs: List[Int], n: Int) =>
+      drop(xs, n).toScalaList shouldBe (xs.toScalaList.drop(n))
+    }
   }
 
   it should "drop elements as long as they match the predicate" in {
-    dropWhile(Nil, (x: Int) => true) shouldBe Nil
-    dropWhile(List(1, 1, 3, 4), (x: Int) => x % 2 != 0) shouldBe List(4)
+    val p = (x: Int) => x % 2 != 0
+
+    forAll { (xs: List[Int], n: Int) =>
+      dropWhile(xs, p).toScalaList shouldBe (xs.toScalaList.dropWhile(p))
+    }
   }
 
   it should "return all elements but the last" in {
-    init(List(1, 2, 3, 4)) shouldBe List(1, 2, 3)
+    forAll { (xs: List[Int]) =>
+      init(xs).toScalaList shouldBe (xs.toScalaList.init)
+    }
   }
 
   it should "count the length" in {
-    length2(List(1, 2, 3, 4)) shouldBe 4
+    forAll { (xs: List[Int]) =>
+      length2(xs) shouldBe (xs.toScalaList.length)
+    }
   }
 
   it should "fold left" in {
-    foldLeft(List(1, 2, 3), 0)(_ + _) shouldBe 6
+    val f = (a: Int, b: Int) => (a + b)
+
+    forAll { (xs: List[Int]) =>
+      foldLeft(xs, 0)(f) shouldBe (xs.toScalaList.foldLeft(0)(f))
+    }
   }
 
   it should "sum, multiply and count length using foldLeft" in {
-    sum3(List(1, 2, 3)) shouldBe 6
-    product3(List(1, 2, 3, 4)) shouldBe 24
-    length3(List(1, 2)) shouldBe 2
+    forAll { (xs: List[Int]) =>
+      sum3(xs) shouldBe (xs.toScalaList.sum)
+      length3(xs) shouldBe (xs.toScalaList.length)
+    }
+
+    forAll { (xs: List[Double]) =>
+      product3(xs) shouldBe (xs.toScalaList.foldLeft(1.0)(_ * _))
+    }
   }
 
   it should "reverse a list" in {
-    reverse(List(1, 2, 3)) shouldBe List(3, 2, 1)
+    forAll { (xs: List[Int]) =>
+      reverse(xs).toScalaList shouldBe (xs.toScalaList.reverse)
+    }
   }
 
   it should "fold left using fold right" in {
-    foldLeft2(List(1, 2, 3), 0)(_ + _) shouldBe 6
+    val f = (a: Int, b: Int) => (a + b)
+
+    forAll { (xs: List[Int]) =>
+      foldLeft2(xs, 0)(f) shouldBe (xs.toScalaList.foldLeft(0)(f))
+    }
   }
 
   it should "fold right using fold left" in {
-    foldRight2(List(1, 2, 3), 0)(_ + _) shouldBe 6
+    val f = (a: Int, b: Int) => (a + b)
+
+    forAll { (xs: List[Int]) =>
+      foldRight2(xs, 0)(f) shouldBe (xs.toScalaList.foldLeft(0)(f))
+    }
   }
 
   it should "append using fold left" in {
-    append2(List(1, 2, 3), List(4)) shouldBe List(1, 2, 3, 4)
-    append2(Nil, List(4)) shouldBe List(4)
-    append2(List(4), Nil) shouldBe List(4)
+    forAll { (xs: List[Int], ys: List[Int]) =>
+      append2(xs, ys).toScalaList shouldBe (xs.toScalaList ++ ys.toScalaList)
+    }
   }
 
   it should "concat two lists" in {
-    concat(List(List(1, 2), List(3, 4))) shouldBe List(1, 2, 3, 4)
+    forAll { (xs: List[Int], ys: List[Int]) =>
+      concat(List(xs, ys)).toScalaList shouldBe (xs.toScalaList ++ ys.toScalaList)
+    }
   }
 
   it should "add 1 to all elements in the list" in {
-    addOne(List(1, 2, 3)) shouldBe List(2, 3, 4)
+    forAll { (xs: List[Int]) =>
+      addOne(xs).toScalaList shouldBe (xs.toScalaList.map(_ + 1))
+    }
   }
 
   it should "convert all elements in the list to Strings" in {
-    convert(List(1.0, 2.0, 3.0)) shouldBe List("1.0", "2.0", "3.0")
+    forAll { (xs: List[Double]) =>
+      convert(xs).toScalaList shouldBe (xs.toScalaList.map(_.toString))
+    }
   }
 
   it should "map over a list" in {
-    map(List(1, 2, 3))(_ + 1) shouldBe List(2, 3, 4)
-    map(List(1, 2, 3))(_.toString) shouldBe List("1", "2", "3")
+    val f = (a: Int) => a + 1
+    val g = (a: Int) => a.toString
+
+    forAll { (xs: List[Int]) =>
+      map(xs)(f).toScalaList shouldBe (xs.toScalaList.map(f))
+      map(xs)(g).toScalaList shouldBe (xs.toScalaList.map(g))
+    }
   }
 
   it should "filter a list" in {
-    filter(List(1, 2, 3))(_ % 2 == 0) shouldBe List(2)
+    val f = (a: Int) => a % 2 == 0
+
+    forAll { (xs: List[Int]) =>
+      filter(xs)(f).toScalaList shouldBe (xs.toScalaList.filter(f))
+    }
   }
 
   it should "flatMap a list" in {
-    flatMap(List(1, 2, 3))(List(_)) shouldBe List(1, 2, 3)
+    forAll { (xs: List[Int]) =>
+      flatMap(xs)(List(_)).toScalaList shouldBe (xs.toScalaList.flatMap(scala.collection.immutable.List(_)))
+    }
   }
 }

@@ -48,7 +48,7 @@ object List {
     xs match {
       case Nil => Nil
       case list @ Cons(_, tail) =>
-        if(n == 0) list
+        if(n <= 0) list
         else drop(tail, n - 1)
     }
 
@@ -145,7 +145,7 @@ object List {
       }
     }
 
-    filt(xs, Nil)
+    reverse(filt(xs, Nil))
   }
 
   def flatMap[A, B](xs: List[A])(f: A => List[B]): List[B] = {

@@ -7,7 +7,11 @@ class ComposeSuite extends UnitSpec {
     val f = (b: String) => b.toInt
     val g = (a: Int) => a.toString
 
-    Compose(f, g)(1) shouldBe 1
-    Compose(g, f)("1") shouldBe "1"
+    forAll { (n: Int) =>
+      Compose(f, g)(n) shouldBe n
+
+      val s = n.toString
+      Compose(g, f)(s) shouldBe s
+    }
   }
 }
