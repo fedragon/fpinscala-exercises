@@ -59,4 +59,14 @@ class ListSpec extends FlatSpec with Matchers {
   it should "fold right using fold left" in {
     foldRight2(List(1, 2, 3), 0)(_ + _) shouldBe 6
   }
+
+  it should "append using fold left" in {
+    append2(List(1, 2, 3), List(4)) shouldBe List(1, 2, 3, 4)
+    append2(Nil, List(4)) shouldBe List(4)
+    append2(List(4), Nil) shouldBe List(4)
+  }
+
+  it should "concat two lists" in {
+    concat(List(List(1, 2), List(3, 4))) shouldBe List(1, 2, 3, 4)
+  }
 }

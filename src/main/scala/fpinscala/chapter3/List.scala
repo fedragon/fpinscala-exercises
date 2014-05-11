@@ -77,6 +77,12 @@ object List {
     reverse(init0(xs, Nil), Nil)
   }
 
+  def append[A](a1: List[A], a2: List[A]): List[A] =
+    a1 match {
+      case Nil => a2
+      case Cons(h, t) => Cons(h, append(t, a2))
+    }
+
   def length2[A](xs: List[A]): Int = foldRight(xs, 0)((_, b) => b + 1)
 
   @scala.annotation.tailrec
@@ -105,4 +111,9 @@ object List {
     val g = (b: B, a: A) => f(a, b)
     foldLeft(xs, z)(g)
   }
+
+  def append2[A](xs: List[A], ys: List[A]): List[A] =
+    foldRight(xs, ys)(Cons(_, _))
+
+  def concat[A](zs: List[List[A]]): List[A] = foldRight(zs, Nil: List[A])(append)
 }
