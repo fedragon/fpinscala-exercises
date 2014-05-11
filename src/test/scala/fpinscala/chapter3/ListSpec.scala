@@ -29,4 +29,16 @@ class ListSpec extends FlatSpec with Matchers {
     dropWhile(Nil, (x: Int) => true) shouldBe Nil
     dropWhile(List(1, 1, 3, 4), (x: Int) => x % 2 != 0) shouldBe List(4)
   }
+
+  it should "return all elements but the last" in {
+    init(List(1, 2, 3, 4)) shouldBe List(1, 2, 3)
+  }
+
+  it should "count the length" in {
+    length2(List(1, 2, 3, 4)) shouldBe 4
+  }
+
+  it should "fold left" in {
+    foldLeft(List(1, 2, 3), 0)(_ + _) shouldBe 6
+  }
 }
