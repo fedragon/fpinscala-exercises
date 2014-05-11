@@ -6,6 +6,7 @@ case object Nil extends List[Nothing]
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
 
 object List {
+
   def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B =
     as match {
       case Nil => z
@@ -76,8 +77,7 @@ object List {
     reverse(init0(xs, Nil), Nil)
   }
 
-  def length2[A](xs: List[A]): Int =
-    foldRight(xs, 0)((_, b) => b + 1)
+  def length2[A](xs: List[A]): Int = foldRight(xs, 0)((_, b) => b + 1)
 
   @scala.annotation.tailrec
   def foldLeft[A, B](xs: List[A], z: B)(f: (B, A) => B): B = {
@@ -86,4 +86,10 @@ object List {
       case Cons(y, ys) => foldLeft(ys, f(z, y))(f)
     }
   }
+
+  def product3(ns: List[Double]) = foldLeft(ns, 1.0)(_ * _)
+
+  def sum3(ns: List[Int]) = foldLeft(ns, 0)(_ + _)
+
+  def length3[A](xs: List[A]): Int = foldLeft(xs, 0)((a, _) => a + 1)
 }

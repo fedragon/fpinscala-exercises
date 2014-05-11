@@ -41,4 +41,10 @@ class ListSpec extends FlatSpec with Matchers {
   it should "fold left" in {
     foldLeft(List(1, 2, 3), 0)(_ + _) shouldBe 6
   }
+
+  it should "sum, multiply and count length using foldLeft" in {
+    sum3(List(1, 2, 3)) shouldBe 6
+    product3(List(1, 2, 3, 4)) shouldBe 24
+    length3(List(1, 2)) shouldBe 2
+  }
 }
