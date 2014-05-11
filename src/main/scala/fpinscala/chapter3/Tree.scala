@@ -9,30 +9,49 @@ object Tree {
 
   def size[A](t: Tree[A]): Int =
     t match {
-      case Branch(l, r) => size(l) + size(r)
       case Leaf(_) => 1
+      case Branch(l, r) => 1 + size(l) + size(r)
     }
 
-  def maximum(t: Tree[Int]): Int = {
-
-    def maximum(st: Tree[Int], m: Int): Int = {
-      st match {
-        case Leaf(v) => m.max(v)
-        case Branch(l, r) => maximum(l, m).max(maximum(r, m))
-      }
+  def maximum(t: Tree[Int]): Int =
+    t match {
+      case Leaf(v) => v
+      case Branch(l, r) => maximum(l).max(maximum(r))
     }
 
-    maximum(t, Int.MinValue)
+  def depth[A](t: Tree[A]): Int =
+    t match {
+        case Leaf(v) => 0
+        case Branch(l, r) => 1 + depth(l).max(depth(r))
+    }
+
+  def map[A, B](t: Tree[A])(f: A => B): Tree[B] = {
+    t match {
+      case Leaf(v) => Leaf(f(v))
+      case Branch(l, r) => Branch(map(l)(f), map(r)(f))
+    }
   }
 
-  def depth[A](t: Tree[A]): Int = {
-    def traverse(st: Tree[A], d: Int): Int = {
-      st match {
-        case Leaf(v) => d
-        case Branch(l, r) => traverse(l, d + 1).max(traverse(r, d + 1))
-      }
+  def fold[A, B](t: Tree[A])(f: A => B)(g: (B, B) => B): B = {
+    t match {
+      case Leaf(v) => f(v)
+      case Branch(l, r) => g(fold(l)(f)(g), fold(r)(f)(g))
     }
+  }
 
-    traverse(t, 0)
+  def size2[A](t: Tree[A]): Int = {
+    fold(t)(_ => 1)(1 + _ + _)
+  }
+
+  def maximum2(t: Tree[Int]): Int = {
+    fold(t)(x => x)((x, y) => x max y)
+  }
+
+  def depth2[A](t: Tree[A]): Int = {
+    fold(t)(_ => 0)((d1, d2) => 1 + d1.max(d2))
+  }
+
+  def map2[A, B](t: Tree[A])(f: A => B): Tree[B] = {
+    fold(t)(a => Leaf(f(a)): Tree[B])((l, r) => Branch(l, r))
   }
 }

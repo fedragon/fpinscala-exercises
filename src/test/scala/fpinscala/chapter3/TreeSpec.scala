@@ -52,15 +52,23 @@ class TreeSpec extends UnitSpec {
 
   it should "return the size" in {
     /*forAll { (xs: Tree[Int]) =>*/
-    Tree.size(xs) shouldBe xs.toScalaList.size
+    Tree.size(xs) shouldBe 11
+    Tree.size2(xs) shouldBe 11
     /*}*/
   }
 
   it should "find the maximum value" in {
     Tree.maximum(xs) shouldBe 7
+    Tree.maximum2(xs) shouldBe 7
   }
 
   it should "find the depth" in {
     Tree.depth(xs) shouldBe 4
+    Tree.depth2(xs) shouldBe 4
+  }
+
+  it should "map every node in the tree" in {
+    Tree.map(xs)(_ + 1).toScalaList shouldBe xs.toScalaList.map(_ + 1)
+    Tree.map2(xs)(_ + 1).toScalaList shouldBe xs.toScalaList.map(_ + 1)
   }
 }
