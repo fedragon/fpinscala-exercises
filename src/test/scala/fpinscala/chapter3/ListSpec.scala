@@ -153,4 +153,24 @@ class ListSpec extends UnitSpec {
       flatMap(xs)(List(_)).toScalaList shouldBe (xs.toScalaList.flatMap(scala.collection.immutable.List(_)))
     }
   }
+
+  it should "filter a list using flatMap" in {
+    val f = (a: Int) => a % 2 == 0
+
+    forAll { (xs: List[Int]) =>
+      filter2(xs)(f).toScalaList shouldBe (xs.toScalaList.filter(f))
+    }
+  }
+
+  it should "add corresponding elements" in {
+    forAll { (xs: List[Int], ys: List[Int]) =>
+      addCorresponding(xs, ys).toScalaList shouldBe (xs.toScalaList.zip(ys.toScalaList).map(i => i._1 + i._2))
+    }
+  }
+
+  it should "apply a function to corresponding elements" in {
+    forAll { (xs: List[Int], ys: List[Int]) =>
+      mapCorresponding(xs, ys)(_ + _).toScalaList shouldBe (xs.toScalaList.zip(ys.toScalaList).map(i => i._1 + i._2))
+    }
+  }
 }

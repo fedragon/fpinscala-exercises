@@ -151,4 +151,24 @@ object List {
   def flatMap[A, B](xs: List[A])(f: A => List[B]): List[B] = {
     foldLeft(map(xs)(f), Nil: List[B])(append)
   }
+
+  def filter2[A](xs: List[A])(f: A => Boolean): List[A] = {
+    val g = (a: A) => if(f(a)) List(a) else Nil
+
+    flatMap(xs)(g)
+  }
+
+  def addCorresponding(xs: List[Int], ys: List[Int]): List[Int] = {
+    (xs, ys) match {
+      case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1 + h2, addCorresponding(t1, t2))
+      case (_, _) => Nil
+    }
+  }
+
+  def mapCorresponding[A](xs: List[A], ys: List[A])(f: (A, A) => A): List[A] = {
+    (xs, ys) match {
+      case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1, h2), mapCorresponding(t1, t2)(f))
+      case (_, _) => Nil
+    }
+  }
 }
