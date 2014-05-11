@@ -92,4 +92,7 @@ object List {
   def sum3(ns: List[Int]) = foldLeft(ns, 0)(_ + _)
 
   def length3[A](xs: List[A]): Int = foldLeft(xs, 0)((a, _) => a + 1)
+
+  def reverse[A](xs: List[A]): List[A] =
+    foldLeft(xs, Nil: List[A])((a, b) => Cons(b, a))
 }
