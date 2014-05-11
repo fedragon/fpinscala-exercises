@@ -47,4 +47,16 @@ class ListSpec extends FlatSpec with Matchers {
     product3(List(1, 2, 3, 4)) shouldBe 24
     length3(List(1, 2)) shouldBe 2
   }
+
+  it should "reverse a list" in {
+    reverse(List(1, 2, 3)) shouldBe List(3, 2, 1)
+  }
+
+  it should "fold left using fold right" in {
+    foldLeft2(List(1, 2, 3), 0)(_ + _) shouldBe 6
+  }
+
+  it should "fold right using fold left" in {
+    foldRight2(List(1, 2, 3), 0)(_ + _) shouldBe 6
+  }
 }

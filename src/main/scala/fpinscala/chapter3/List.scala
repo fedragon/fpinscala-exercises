@@ -7,7 +7,7 @@ case class Cons[+A](head: A, tail: List[A]) extends List[A]
 
 object List {
 
-  def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B =
+  def foldRight[A, B](as: List[A], z: B)(f: (A, B) => B): B =
     as match {
       case Nil => z
       case Cons(x, xs) => f(x, foldRight(xs, z)(f))
@@ -95,4 +95,14 @@ object List {
 
   def reverse[A](xs: List[A]): List[A] =
     foldLeft(xs, Nil: List[A])((a, b) => Cons(b, a))
+
+  def foldLeft2[A, B](xs: List[A], z: B)(f: (B, A) => B): B = {
+    val g = (a: A, b: B) => f(b, a)
+    foldRight(xs, z)(g)
+  }
+
+  def foldRight2[A, B](xs: List[A], z: B)(f: (A, B) => B): B = {
+    val g = (b: B, a: A) => f(a, b)
+    foldLeft(xs, z)(g)
+  }
 }
