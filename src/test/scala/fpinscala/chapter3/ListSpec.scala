@@ -173,4 +173,9 @@ class ListSpec extends UnitSpec {
       mapCorresponding(xs, ys)(_ + _).toScalaList shouldBe (xs.toScalaList.zip(ys.toScalaList).map(i => i._1 + i._2))
     }
   }
+
+  it should "check if a list is a subsequence of another list" in {
+    hasSubsequence(List(1, 2, 3, 4), List(2, 3)) shouldBe (true)
+    hasSubsequence(List(1, 2, 3, 4), List(4, 3)) shouldBe (false)
+  }
 }
