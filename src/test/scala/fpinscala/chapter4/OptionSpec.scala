@@ -52,4 +52,8 @@ class OptionSpec extends UnitSpec {
     Option.sequence(List(Some(1), Some(2))) shouldBe Some(List(1, 2))
   }
 
+  it should "traverse a list of options" in {
+    Option.traverse(List(Some(1), Some(2)))(identity) shouldBe Some(List(1, 2))
+  }
+
 }
