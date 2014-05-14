@@ -7,11 +7,37 @@ sealed trait Stream[+A] {
     case Cons(h, t) => Some(h())
   }
 
+  def take(n: Int): Stream[A] =
+    this match {
+      case Empty => Empty
+      case Cons(h, t) =>
+        if(n > 0) Stream.cons(h(), t().take(n - 1))
+        else Empty
+    }
+
+  def takeWhile(p: A => Boolean): Stream[A] =
+    this match {
+      case Empty => Empty
+      case Cons(h, t) =>
+        val hd = h()
+        if(p(hd)) Stream.cons(hd, t().takeWhile(p))
+        else Empty
+    }
+
+  def drop(n: Int): Stream[A] =
+    this match {
+      case Empty => Empty
+      case Cons(h, t) =>
+        if(n > 0) t().drop(n -1)
+        else this
+    }
+
   def toList: List[A] =
     this match {
       case Empty => Nil
       case Cons(h, t) => h() :: t().toList
     }
+
 }
 
 object Stream {
