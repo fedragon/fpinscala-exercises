@@ -22,4 +22,12 @@ class EitherSpec extends UnitSpec {
     Right(1).map2(Right(2))(_ + _) shouldBe Right(3)
   }
 
+  it should "sequence" in {
+    Either.sequence(List(Right(1), Left("whoops"))) shouldBe Left("whoops")
+    Either.sequence(List(Right(1), Right(2))) shouldBe Right(List(1, 2))
+  }
+
+  it should "traverse" in {
+    Either.traverse(List(Right(1), Right(2)))(identity) shouldBe Right(List(1, 2))
+  }
 }
