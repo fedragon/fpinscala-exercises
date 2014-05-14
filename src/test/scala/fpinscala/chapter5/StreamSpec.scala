@@ -7,6 +7,18 @@ class StreamSpec extends UnitSpec {
 
   implicit val positive = Arbitrary(Gen.choose(0, 20))
 
+  it should "build a stream with constant values" in {
+    forAll { (n: Int, m: Int) =>
+      Stream.constant(1).take(m).toList shouldBe List.fill(m)(1)
+    }
+  }
+
+  it should "build a stream from a number" in {
+    forAll { (n: Int, m: Int) =>
+      Stream.from(n).take(m).toList shouldBe (0 until m).map(_ + n).toList
+    }
+  }
+
   it should "drop" in {
     forAll { (n: Int, m: Int) =>
       val expected = (0 until n).toList
