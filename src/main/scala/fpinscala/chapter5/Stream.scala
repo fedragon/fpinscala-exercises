@@ -83,6 +83,15 @@ object Stream {
 
   def constant[A](a: A): Stream[A] = cons(a, constant(a))
 
+  def fibs: Stream[Int] = {
+    def f(n_2: Int, n_1: Int): Stream[Int] = {
+      val next = n_2 + n_1
+      cons(next, f(n_1, next))
+    }
+
+    cons(0, cons(1, f(0, 1)))
+  }
+
   def from(n: Int): Stream[Int] = cons(n, from(n + 1))
 
   def empty[A]: Stream[A] = Empty

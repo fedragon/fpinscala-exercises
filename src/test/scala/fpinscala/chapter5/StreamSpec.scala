@@ -26,6 +26,10 @@ class StreamSpec extends UnitSpec {
     }
   }
 
+  it should "build a Fibonacci sequence" in {
+    Stream.fibs.take(5).toList shouldBe List(0, 1, 1, 2, 3)
+  }
+
   it should "filter" in {
     forAll { (n: Int) =>
       val expected = (0 until n).toList
