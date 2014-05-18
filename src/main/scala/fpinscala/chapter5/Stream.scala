@@ -75,6 +75,11 @@ sealed trait Stream[+A] {
 }
 
 object Stream {
+
+  def apply[A](as: A*): Stream[A] =
+    if (as.isEmpty) empty
+    else cons(as.head, apply(as.tail: _*))
+
   def cons[A](hd: => A, tl: => Stream[A]): Stream[A] = {
     lazy val head = hd
     lazy val tail = tl
@@ -83,22 +88,43 @@ object Stream {
 
   def constant[A](a: A): Stream[A] = cons(a, constant(a))
 
+  def constant2[A](a: A): Stream[A] =
+    unfold(a)((x: A) => Some((x, x)))
+
+  def empty[A]: Stream[A] = Empty
+
   def fibs: Stream[Int] = {
-    def f(n_2: Int, n_1: Int): Stream[Int] = {
-      val next = n_2 + n_1
-      cons(next, f(n_1, next))
+    def f(f0: Int, f1: Int): Stream[Int] = {
+      val next = f0 + f1
+      cons(next, f(f1, next))
     }
 
     cons(0, cons(1, f(0, 1)))
   }
 
+  def fibs2: Stream[Int] = {
+    unfold((0, 1)) {
+      case (f0, f1) => Some((f0, (f1, f0 + f1)))
+    }
+  }
+
   def from(n: Int): Stream[Int] = cons(n, from(n + 1))
 
-  def empty[A]: Stream[A] = Empty
+  def from2(n: Int): Stream[Int] =
+    unfold(n)((x: Int) => Some((x, x + 1)))
 
-  def apply[A](as: A*): Stream[A] =
-    if (as.isEmpty) empty
-    else cons(as.head, apply(as.tail: _*))
+  val ones: Stream[Int] = Stream.cons(1, ones)
+
+  val ones2: Stream[Int] = unfold(1)((_: Int) => Some((1, 1)))
+
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = {
+    f(z) match {
+      case None => Empty
+      case Some((value, state)) =>
+        cons(value, unfold(state)(f))
+    }
+  }
+
 }
 
 case object Empty extends Stream[Nothing]

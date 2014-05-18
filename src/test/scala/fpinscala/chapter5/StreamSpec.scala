@@ -10,12 +10,21 @@ class StreamSpec extends UnitSpec {
   it should "build a stream with constant values" in {
     forAll { (n: Int, m: Int) =>
       Stream.constant(1).take(m).toList shouldBe List.fill(m)(1)
+      Stream.constant2(1).take(m).toList shouldBe List.fill(m)(1)
+    }
+  }
+
+  it should "build a stream of ones" in {
+    forAll { (n: Int, m: Int) =>
+      Stream.ones.take(m).toList shouldBe (0 until m).map(_ => 1).toList
+      Stream.ones2.take(m).toList shouldBe (0 until m).map(_ => 1).toList
     }
   }
 
   it should "build a stream from a number" in {
     forAll { (n: Int, m: Int) =>
       Stream.from(n).take(m).toList shouldBe (0 until m).map(_ + n).toList
+      Stream.from2(n).take(m).toList shouldBe (0 until m).map(_ + n).toList
     }
   }
 
@@ -28,6 +37,7 @@ class StreamSpec extends UnitSpec {
 
   it should "build a Fibonacci sequence" in {
     Stream.fibs.take(5).toList shouldBe List(0, 1, 1, 2, 3)
+    Stream.fibs2.take(5).toList shouldBe List(0, 1, 1, 2, 3)
   }
 
   it should "filter" in {
@@ -113,5 +123,14 @@ class StreamSpec extends UnitSpec {
       val expected = (0 until n).toList
       Stream(expected:_*).toList shouldBe expected
     }
+  }
+
+  it should "unfold" in {
+    def f(xy: (Int, Int)): Option[(Int, (Int, Int))] = {
+      val next = xy._1 + xy._2
+      Some((xy._1, (xy._2, next)))
+    }
+
+    Stream.unfold((0, 1))(f).take(5).toList shouldBe List(0, 1, 1, 2, 3)
   }
 }
