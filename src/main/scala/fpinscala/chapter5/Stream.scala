@@ -46,25 +46,41 @@ sealed trait Stream[+A] {
   def map[B](f: A => B): Stream[B] =
     foldRight(empty[B])((a, b) => cons(f(a), b))
 
+  def mapViaUnfold[B](f: A => B): Stream[B] =
+    unfold(this) {
+      case Cons(h, t) => Some((f(h()), t()))
+      case _ => None
+    }
+
   def take(n: Int): Stream[A] =
     this match {
-      case Empty => empty
-      case Cons(h, t) =>
-        if(n > 0) cons(h(), t().take(n - 1))
-        else empty
+      case Cons(h, t) if n > 0 =>
+        cons(h(), t().take(n - 1))
+      case _ => empty
     }
+
+  def takeViaUnfold(n: Int): Stream[A] = {
+    unfold(this) {
+      case Cons(h, t) if n > 0 =>
+        Some((h(), t().take(n - 1)))
+      case _ => None
+    }
+  }
 
   def takeWhile(p: A => Boolean): Stream[A] =
     this match {
-      case Empty => empty
-      case Cons(h, t) =>
-        lazy val hd = h()
-        if(p(hd)) cons(hd, t().takeWhile(p))
-        else empty
+      case Cons(h, t) if(p(h())) => cons(h(), t().takeWhile(p))
+      case _ => empty
     }
 
   def takeWhile2(p: A => Boolean): Stream[A] =
     foldRight(empty[A])((a, b) => if(p(a)) cons(a, b) else b)
+
+  def takeWhileViaUnfold(p: A => Boolean): Stream[A] =
+    unfold(this) {
+      case Cons(h, t) if(p(h())) => Some((h(), t().takeWhile(p)))
+      case _ => None
+    }
 
   def toList: List[A] =
     this match {

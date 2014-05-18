@@ -75,13 +75,6 @@ class StreamSpec extends UnitSpec {
       val expected = (0 until n).toList
 
       Stream(expected:_*).headOption shouldBe expected.headOption
-    }
-  }
-
-  it should "headOption2" in {
-    forAll { (n: Int) =>
-      val expected = (0 until n).toList
-
       Stream(expected:_*).headOption2 shouldBe expected.headOption
     }
   }
@@ -92,6 +85,7 @@ class StreamSpec extends UnitSpec {
       val f = (x: Int) => x * 5
 
       Stream(expected:_*).map(f).toList shouldBe expected.map(f)
+      Stream(expected:_*).mapViaUnfold(f).toList shouldBe expected.map(f)
     }
   }
 
@@ -99,6 +93,7 @@ class StreamSpec extends UnitSpec {
     forAll { (n: Int, m: Int) =>
       val expected = (0 until n).toList
       Stream(expected:_*).take(m).toList shouldBe expected.take(m)
+      Stream(expected:_*).takeViaUnfold(m).toList shouldBe expected.take(m)
     }
   }
 
@@ -107,14 +102,8 @@ class StreamSpec extends UnitSpec {
       val expected = (0 until n).toList
       val p = (n: Int) => n < 5
       Stream(expected:_*).takeWhile(p).toList shouldBe expected.takeWhile(p)
-    }
-  }
-
-  it should "takeWhile2" in {
-    forAll { (n: Int) =>
-      val expected = (0 until n).toList
-      val p = (n: Int) => n < 5
       Stream(expected:_*).takeWhile2(p).toList shouldBe expected.takeWhile(p)
+      Stream(expected:_*).takeWhileViaUnfold(p).toList shouldBe expected.takeWhile(p)
     }
   }
 
