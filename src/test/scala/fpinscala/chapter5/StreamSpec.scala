@@ -122,4 +122,11 @@ class StreamSpec extends UnitSpec {
 
     Stream.unfold((0, 1))(f).take(5).toList shouldBe List(0, 1, 1, 2, 3)
   }
+
+  it should "zipAll" in {
+    Stream.empty.zipAll(Stream.empty).toList shouldBe List()
+    Stream(0, 1, 2).zipAll(Stream(5, 6, 7)).toList shouldBe List((Some(0), Some(5)), (Some(1), Some(6)), (Some(2), Some(7)))
+    Stream(0, 1).zipAll(Stream(5, 6, 7)).toList shouldBe List((Some(0), Some(5)), (Some(1), Some(6)), (None, Some(7)))
+    Stream(0, 1, 2).zipAll(Stream(5, 6)).toList shouldBe List((Some(0), Some(5)), (Some(1), Some(6)), (Some(2), None))
+  }
 }

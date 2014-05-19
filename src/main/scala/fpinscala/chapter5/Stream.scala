@@ -59,6 +59,7 @@ sealed trait Stream[+A] {
       case _ => empty
     }
 
+  // FIXME Only use unfold!
   def takeViaUnfold(n: Int): Stream[A] = {
     unfold(this) {
       case Cons(h, t) if n > 0 =>
@@ -67,6 +68,7 @@ sealed trait Stream[+A] {
     }
   }
 
+  // FIXME Only use unfold!
   def takeWhile(p: A => Boolean): Stream[A] =
     this match {
       case Cons(h, t) if(p(h())) => cons(h(), t().takeWhile(p))
@@ -88,6 +90,24 @@ sealed trait Stream[+A] {
       case Cons(h, t) => h() :: t().toList
     }
 
+  def zipAll[B](s2: Stream[B]): Stream[(Option[A],Option[B])] = {
+    unfold((this, s2)) {
+      case (Cons(h1, t1), Cons(h2, t2)) =>
+        val value = (Some(h1()), Some(h2()))
+        val state = (t1(), t2())
+        Some((value, state))
+      case (Cons(h, t), Empty) =>
+        val value = (Some(h()), None)
+        val state = (t(), empty)
+        Some((value, state))
+      case (Empty, Cons(h, t)) =>
+        val value = (None, Some(h()))
+        val state = (empty, t())
+        Some((value, state))
+      case (Empty, Empty) =>
+        None
+    }
+  }
 }
 
 object Stream {
@@ -140,7 +160,6 @@ object Stream {
         cons(value, unfold(state)(f))
     }
   }
-
 }
 
 case object Empty extends Stream[Nothing]
