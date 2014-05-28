@@ -61,9 +61,8 @@ sealed trait Stream[+A] {
 
   // FIXME Only use unfold!
   def takeViaUnfold(n: Int): Stream[A] = {
-    unfold(this) {
-      case Cons(h, t) if n > 0 =>
-        Some((h(), t().take(n - 1)))
+    unfold((this, n)) {
+      case (Cons(h, t), m) if m > 0 => Some((h(), (t(), m - 1)))
       case _ => None
     }
   }
@@ -80,7 +79,7 @@ sealed trait Stream[+A] {
 
   def takeWhileViaUnfold(p: A => Boolean): Stream[A] =
     unfold(this) {
-      case Cons(h, t) if(p(h())) => Some((h(), t().takeWhile(p)))
+      case Cons(h, t) if(p(h())) => Some((h(), t()))
       case _ => None
     }
 
