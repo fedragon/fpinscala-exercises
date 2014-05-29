@@ -12,7 +12,7 @@ sealed trait Stream[+A] {
     this match {
       case Empty => empty
       case Cons(h, t) =>
-        if(n > 0) t().drop(n -1)
+        if(n > 0) t().drop(n - 1)
         else this
     }
 
@@ -31,8 +31,7 @@ sealed trait Stream[+A] {
   def forAll(p: A => Boolean): Boolean =
     this match {
       case Empty => true
-      case Cons(h, t) =>
-        p(h()) && t().forAll(p)
+      case Cons(h, t) => p(h()) && t().forAll(p)
     }
 
   def headOption: Option[A] = this match {
@@ -59,7 +58,6 @@ sealed trait Stream[+A] {
       case _ => empty
     }
 
-  // FIXME Only use unfold!
   def takeViaUnfold(n: Int): Stream[A] = {
     unfold((this, n)) {
       case (Cons(h, t), m) if m > 0 => Some((h(), (t(), m - 1)))
@@ -67,7 +65,6 @@ sealed trait Stream[+A] {
     }
   }
 
-  // FIXME Only use unfold!
   def takeWhile(p: A => Boolean): Stream[A] =
     this match {
       case Cons(h, t) if(p(h())) => cons(h(), t().takeWhile(p))

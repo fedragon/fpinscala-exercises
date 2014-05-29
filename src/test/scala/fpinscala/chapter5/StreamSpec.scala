@@ -5,6 +5,7 @@ import org.scalacheck.{Arbitrary, Gen}
 
 class StreamSpec extends UnitSpec {
 
+  // arbitrary stream size: should always be a positive number
   implicit val positive = Arbitrary(Gen.choose(0, 20))
 
   it should "build a stream with constant values" in {
@@ -16,15 +17,17 @@ class StreamSpec extends UnitSpec {
 
   it should "build a stream of ones" in {
     forAll { (n: Int, m: Int) =>
-      Stream.ones.take(m).toList shouldBe (0 until m).map(_ => 1).toList
-      Stream.ones2.take(m).toList shouldBe (0 until m).map(_ => 1).toList
+      val expected = (0 until m).map(_ => 1).toList
+      Stream.ones.take(m).toList shouldBe expected
+      Stream.ones2.take(m).toList shouldBe expected
     }
   }
 
   it should "build a stream from a number" in {
     forAll { (n: Int, m: Int) =>
-      Stream.from(n).take(m).toList shouldBe (0 until m).map(_ + n).toList
-      Stream.from2(n).take(m).toList shouldBe (0 until m).map(_ + n).toList
+      val expected = (0 until m).map(_ + n).toList
+      Stream.from(n).take(m).toList shouldBe expected
+      Stream.from2(n).take(m).toList shouldBe expected 
     }
   }
 
@@ -36,8 +39,9 @@ class StreamSpec extends UnitSpec {
   }
 
   it should "build a Fibonacci sequence" in {
-    Stream.fibs.take(5).toList shouldBe List(0, 1, 1, 2, 3)
-    Stream.fibs2.take(5).toList shouldBe List(0, 1, 1, 2, 3)
+    val expected = List(0, 1, 1, 2, 3)
+    Stream.fibs.take(5).toList shouldBe expected
+    Stream.fibs2.take(5).toList shouldBe expected
   }
 
   it should "filter" in {
@@ -92,6 +96,7 @@ class StreamSpec extends UnitSpec {
   it should "take" in {
     forAll { (n: Int, m: Int) =>
       val expected = (0 until n).toList
+
       Stream(expected:_*).take(m).toList shouldBe expected.take(m)
       Stream(expected:_*).takeViaUnfold(m).toList shouldBe expected.take(m)
     }
@@ -101,6 +106,7 @@ class StreamSpec extends UnitSpec {
     forAll { (n: Int) =>
       val expected = (0 until n).toList
       val p = (n: Int) => n < 5
+
       Stream(expected:_*).takeWhile(p).toList shouldBe expected.takeWhile(p)
       Stream(expected:_*).takeWhile2(p).toList shouldBe expected.takeWhile(p)
       Stream(expected:_*).takeWhileViaUnfold(p).toList shouldBe expected.takeWhile(p)
