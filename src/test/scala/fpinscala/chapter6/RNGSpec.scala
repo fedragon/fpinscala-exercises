@@ -18,20 +18,39 @@ class RNGSpec extends UnitSpec {
 
   it should "generate a random double between 0 (included) and 1 (excluded)" in {
     forAll { (seed: Long) =>
-      val (value, _) = RNG.double(SimpleRNG(seed))
-      value should be >= 0d
-      value should be < 1d
+      {
+        val (value, _) = RNG.double(SimpleRNG(seed))
+        value should be >= 0d
+        value should be < 1d
+      }
+
+      {
+        val (value, _) = RNG.doubleWithMap(SimpleRNG(seed))
+        value should be >= 0d
+        value should be < 1d
+      }
     }
   }
 
   it should "generate a random pair (Int, Double)" in {
     forAll { (seed: Long) =>
-      val ((iValue, dValue), _) = RNG.intDouble(SimpleRNG(seed))
-      iValue should be >= 0
-      iValue should be <= Int.MaxValue
+      {
+        val ((i, d), _) = RNG.intDouble(SimpleRNG(seed))
+        i should be >= 0
+        i should be <= Int.MaxValue
 
-      dValue should be >= 0d
-      dValue should be < 1d
+        d should be >= 0d
+        d should be < 1d
+      }
+
+      {
+        val ((i, d), _) = RNG.intDoubleWithMap2(SimpleRNG(seed))
+        i should be >= 0
+        i should be <= Int.MaxValue
+
+        d should be >= 0d
+        d should be < 1d
+      }
     }
   }
 
