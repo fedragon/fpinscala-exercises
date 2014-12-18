@@ -80,11 +80,22 @@ class RNGSpec extends UnitSpec {
 
   it should "generate a list of random integers" in {
     forAll { (count: Int, seed: Long) =>
-      val (is, _) = RNG.ints(count)(SimpleRNG(seed))
+      {
+        val (is, _) = RNG.ints(count)(SimpleRNG(seed))
 
-      is.foreach { i =>
-        i should be >= 0
-        i should be <= Int.MaxValue
+        is.foreach { i =>
+          i should be >= Int.MinValue
+          i should be <= Int.MaxValue
+        }
+      }
+
+      {
+        val (is, _) = RNG.intsWithSequence(count)(SimpleRNG(seed))
+
+        is.foreach { i =>
+          i should be >= Int.MinValue
+          i should be <= Int.MaxValue
+        }
       }
     }
   }

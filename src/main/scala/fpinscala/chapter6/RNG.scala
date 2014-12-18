@@ -24,6 +24,10 @@ object RNG {
       (Math.abs(value), state)
   }
 
+  type Rand[+A] = RNG => (A, RNG)
+
+  val int: Rand[Int] = _.nextInt
+
   def double(rng: RNG): (Double, RNG) = {
     val (value, state) = nonNegativeInt(rng)
 
@@ -54,11 +58,13 @@ object RNG {
   def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
     (0 until count).foldLeft((Nil: List[Int], rng)) { (acc, _) =>
       val (is, state) = acc
-      val (i, newState) = nonNegativeInt(state)
+      val (i, newState) = state.nextInt
 
       (i :: is, newState)
     }
   }
+
+  def unit[A](a: A): Rand[A] = rng => (a, rng)
 
   def map[A, B](s: Rand[A])(f: A => B): Rand[B] = {
     rng =>
@@ -79,6 +85,27 @@ object RNG {
   }
 
   def intDoubleWithMap2(rng: RNG): ((Int, Double), RNG) = {
-    map2(nonNegativeInt, double)((a, b) => (a, b))(rng)
+    map2(nonNegativeInt, double)((_, _))(rng)
   }
+
+  def both[A, B](ra: Rand[A], rb: Rand[B]): Rand[(A, B)] = map2(ra, rb)((_, _))
+
+  def randIntDouble = both(int, double)
+
+  def randDoubleInt = both(double, int)
+
+  def sequence[A](rs: List[Rand[A]]): Rand[List[A]] = { rng =>
+    def seq(r: RNG, xs: List[Rand[A]], acc: List[A]): Rand[List[A]] = {
+      if(xs.isEmpty) unit(acc)
+      else {
+        val (a, r2) = xs.head(r)
+        seq(r2, xs.tail, a :: acc)
+      }
+    }
+
+    seq(rng, rs, Nil: List[A])(rng)
+  }
+
+  def intsWithSequence(count: Int)(rng: RNG): (List[Int], RNG) =
+    sequence(List.fill(count)(int))(rng)
 }
