@@ -5,10 +5,10 @@ import org.scalacheck.{Arbitrary, Gen}
 
 class RNGSpec extends UnitSpec {
 
-  implicit val positiveInt = Arbitrary(Gen.choose(0, 10))
+  implicit val positiveInt = Arbitrary(Gen.choose(1, 10))
   implicit val positiveLong = Arbitrary(Gen.choose(0L, 10L))
 
-  it should "generate a random integer greater or equal to zero" in {
+  it should "generate a random non negative integer" in {
     forAll { (seed: Long) =>
       val (value, _) = RNG.nonNegativeInt(SimpleRNG(seed))
       value should be >= 0
@@ -97,6 +97,14 @@ class RNGSpec extends UnitSpec {
           i should be <= Int.MaxValue
         }
       }
+    }
+  }
+
+  it should "generate a random non negative integer less than n" in {
+    forAll { (n: Int, seed: Long) =>
+      val (value, _) = RNG.nonNegativeLessThan(n)(SimpleRNG(seed))
+      value should be >= 0
+      value should be <= n
     }
   }
 }
