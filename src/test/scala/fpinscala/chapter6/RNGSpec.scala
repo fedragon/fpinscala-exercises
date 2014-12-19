@@ -107,4 +107,10 @@ class RNGSpec extends UnitSpec {
       value should be <= n
     }
   }
+
+  it should "combine two randoms" in {
+    forAll { (s1: Long, s2: Long) =>
+
+    }
+  }
 }
