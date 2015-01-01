@@ -61,7 +61,7 @@ object Par {
   }
 }
 
-object ParallelizedSum {
+object Parallelized {
 
   import Par._
 
@@ -72,4 +72,11 @@ object ParallelizedSum {
       val (l, r) = ints.splitAt(ints.length / 2)
       map2(fork(sum(l)), fork(sum(r)))(_ + _)
     }
+
+  def max(ints: IndexedSeq[Int]): Par[Int] = {
+    val f = (is: Seq[Int]) => is.reverse.head
+    val sortedList = sortPar2(unit(ints.toList))
+    map2(sortedList, unit(f))((a, g) => g(a))
+  }
+
 }

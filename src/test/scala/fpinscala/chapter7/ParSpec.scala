@@ -21,4 +21,11 @@ class ParSpec extends UnitSpec {
     Par.run(e)(actual) shouldBe Par.run(e)(expected)
   }
 
+  it should "find the maximum value in a list" in {
+    val expected = Par.unit(3)
+    val actual = Parallelized.max(Vector(1, 2, 3))
+
+    Par.run(e)(actual) shouldBe Par.run(e)(expected)
+  }
+
 }
