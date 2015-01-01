@@ -28,4 +28,11 @@ class ParSpec extends UnitSpec {
     Par.run(e)(actual) shouldBe Par.run(e)(expected)
   }
 
+  it should "count the words in a list of paragraphs" in {
+    val expected = Par.unit(4)
+    val actual = Parallelized.words(List("hello world", "in 2015"))
+
+    Par.run(e)(actual) shouldBe Par.run(e)(expected)
+  }
+
 }

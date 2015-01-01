@@ -79,4 +79,9 @@ object Parallelized {
     map2(sortedList, unit(f))((a, g) => g(a))
   }
 
+  def words(ps: List[String]): Par[Int] = {
+    val ws = map(unit(ps))(_.flatMap(_.split(" ")))
+    val f = (ws: List[String]) => ws.size
+    map2(ws, unit(f))((xs, g) => g(xs))
+  }
 }
