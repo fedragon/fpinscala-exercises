@@ -49,6 +49,10 @@ object Par {
     sequence(fbs)
   }
 
+  def parFilter[A](ps: List[A])(f: A => Boolean): Par[List[A]] = {
+    map2(unit(ps), unit(f))((as, f) => as.filter(f))
+  }
+
   private case class UnitFuture[A](get: A) extends Future[A] {
     def isDone = true
     def get(timeout: Long, units: TimeUnit): A = get

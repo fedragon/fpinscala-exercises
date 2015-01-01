@@ -3,15 +3,21 @@ package chapter7
 
 import java.util.concurrent.{Executors, ExecutorService}
 
-import Par._
-
 class ParSpec extends UnitSpec {
 
-  it should "sequence a list of Par into a Par of list" in {
-    val e = Executors.newFixedThreadPool(1)
+  val e = Executors.newFixedThreadPool(1)
 
-    val expected = unit(List(1, 2))
-    val actual = Par.sequence(List(unit(1), unit(2)))
+  it should "sequence a list of Par into a Par of list" in {
+    val expected = Par.unit(List(1, 2))
+    val actual = Par.sequence(List(Par.unit(1), Par.unit(2)))
+
+    Par.run(e)(actual) shouldBe Par.run(e)(expected)
+  }
+
+  it should "filter a list of Par" in {
+    val expected = Par.unit(List(2))
+    val actual = Par.parFilter(List(1, 2, 3))(_ % 2 == 0)
+
     Par.run(e)(actual) shouldBe Par.run(e)(expected)
   }
 
