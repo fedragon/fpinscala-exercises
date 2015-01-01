@@ -14,13 +14,59 @@ case class SimpleRNG(seed: Long) extends RNG {
   }
 }
 
+object State {
+
+  def unit[S, A](a: A): State[S, A] = State(s => (a, s))
+
+  def sequence[S, A](rs: List[State[S, A]]): State[S, List[A]] = {
+    def seq(s: S, xs: List[State[S, A]], acc: List[A]): (List[A], S) = {
+      xs match {
+        case Nil => (acc.reverse, s)
+        case hd :: tl =>
+          val (a, s2) = hd.run(s)
+          seq(s2, tl, a :: acc)
+      }
+    }
+
+    State((s: S) => seq(s, rs, Nil: List[A]))
+  }
+
+  def modify[S](f: S => S): State[S, Unit] = for {
+    s <- get
+    _ <- set(f(s))
+  } yield ()
+
+  def get[S]: State[S, S] = State(s => (s, s))
+
+  def set[S](s: S): State[S, Unit] = State(_ => ((), s))
+}
+
+import State._
+
+case class State[S, +A](run: S => (A,S)) {
+
+  def flatMap[B](f: A => State[S, B]): State[S, B] = State(s => {
+    val (a, s1) = run(s)
+    f(a).run(s1)
+  })
+
+  def map[B](f: A => B): State[S, B] =
+    flatMap(a => unit(f(a)))
+
+  def map2[B, C](that: State[S, B])(f: (A, B) => C): State[S, C] =
+    flatMap(a => that.map(b => f(a, b)))
+}
+
 object RNG {
+
   def nonNegativeInt(rng: RNG): (Int, RNG) = {
     val (i, r) = rng.nextInt
     (if (i < 0) -(i + 1) else i, r)
   }
 
-  type Rand[+A] = RNG => (A, RNG)
+  type State[S, +A] = S => (A, S)
+  // type Rand[+A] = RNG => (A, RNG)
+  type Rand[A] = State[RNG, A]
 
   val int: Rand[Int] = _.nextInt
 
@@ -62,9 +108,9 @@ object RNG {
 
   def unit[A](a: A): Rand[A] = rng => (a, rng)
 
-  def map[A, B](s: Rand[A])(f: A => B): Rand[B] = { rng =>
-    val (a, rng2) = s(rng)
-    (f(a), rng2)
+  def map[S, A, B](a: S => (A,S))(f: A => B): S => (B,S) = { rng =>
+    val (s, rng2) = a(rng)
+    (f(s), rng2)
   }
 
   def doubleWithMap(rng: RNG): (Double, RNG) =
