@@ -53,7 +53,21 @@ object Par {
     map2(unit(ps), unit(f))((as, f) => as.filter(f))
   }
 
-  private case class UnitFuture[A](get: A) extends Future[A] {
+  def choice[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
+    es =>
+      if (run(es)(cond).get) t(es)
+      else f(es)
+
+  def choiceN[A](n: Par[Int])(choices: List[Par[A]]): Par[A] =
+    es => {
+      val idx = run(es)(n).get
+      choices.toIndexedSeq(idx)(es)
+    }
+
+  def choiceViaChoiceN[A](a: Par[Boolean])(ifTrue: Par[A], ifFalse: Par[A]): Par[A] =
+    choiceN(map(a)(b => if(b) 0 else 1))(List(ifTrue, ifFalse))
+
+  private case class UnitFuture[A](get: A) extends java.util.concurrent.Future[A] {
     def isDone = true
     def get(timeout: Long, units: TimeUnit): A = get
     def isCancelled = false
